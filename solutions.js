@@ -1,7 +1,9 @@
 const mongo = require('mongodb').MongoClient;
 const process = require('process');
 const url = 'mongodb://localhost:27017/learnyoumongo';
-const age = parseInt(process.argv[2]);
+// const age = parseInt(process.argv[2]);
+const size = process.argv[2];
+
 
 // const firstName = process.argv[2];
 // const lastName = process.argv[3];
@@ -26,11 +28,11 @@ mongo.connect(url, function (err, db) {
 
 	// insert in mongodb
 	/*		let data = db.db("learnyoumongo");
-			const obj = {
+			const User = {
 				firstName: firstName,
 				lastName: lastName
 			}
-			data.collection('docs').insert(obj, function (err, data) {
+			data.collection('docs').insert(User, function (err, data) {
 				if (err) throw err;
 				console.log(JSON.stringify(obj));
 			})
@@ -55,11 +57,38 @@ mongo.connect(url, function (err, db) {
 	*/
 
 	// count in mongodb
-	let data = db.db('learnyoumongo');
-		data.collection('parrots').count({ age: { $gt: +age } }, function (err, count) {
-		if (err) throw err;
-		console.log(count);
-		data.close();
-	});
-});
+	// let data = db.db('learnyoumongo');
+	// 	data.collection('parrots').count({ age: { $gt: +age } }, function (err, count) {
+	// 	if (err) throw err;
+	// 	console.log(count);
+	// 	data.close();
+	// });
 
+	//aggregate in Mongodb 
+		data.collection("prices").aggregate([
+			{ 
+				$match: 
+				{
+					size: size
+			}}
+		,{ 
+			$group:
+				 {
+					_id: 'average'
+			,average: 
+				{
+					$avg: '$price'
+				}
+			}}
+		])
+		.toArray(function(err, data) {
+			if (err) throw err;
+			if (data.length ==="") 
+				{
+					throw new Error('No data found')
+				}
+			let firstval = data[0];
+			console.log(Number(firstval.average).toFixed(2))
+			db.close()
+		});
+	});
