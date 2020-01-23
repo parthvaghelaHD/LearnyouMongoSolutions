@@ -1,7 +1,9 @@
 const mongo = require('mongodb').MongoClient;
 const process = require('process');
-const url = 'mongodb://localhost:27017/learnyoumongo'
-const firstName = process.argv[2];
+const url = 'mongodb://localhost:27017/learnyoumongo';
+const age = parseInt(process.argv[2]);
+
+// const firstName = process.argv[2];
 // const lastName = process.argv[3];
 
 mongo.connect(url, function (err, db) {
@@ -37,9 +39,26 @@ mongo.connect(url, function (err, db) {
 
 
 	// update in mongodb
-	let data = db.db('learnyoumongo');
+	/*let data = db.db('learnyoumongo');
 	data.collection('users').update({ username: 'tinatime' }, { $set: { age: 40 } }).toArray((err) => {
 		if (err) throw err;
+		data.close();
+	});
+	*/
+
+	//remove in mongodb
+	/*let data = db.db('learnyoumongo');
+	data.collection(process.argv[3]).remove({ _id: process.argv[4] }).toArray((err) => {
+		if (err) throw err;
+		data.close();
+	});
+	*/
+
+	// count in mongodb
+	let data = db.db('learnyoumongo');
+		data.collection('parrots').count({ age: { $gt: +age } }, function (err, count) {
+		if (err) throw err;
+		console.log(count);
 		data.close();
 	});
 });
